@@ -4,7 +4,8 @@ import TaskList from './src/screens/TaskList'
 export default function App() {
   return (
     <View style={styles.container}>
-      <TaskList />            
+      <TaskList />   
+      <Text>Teste GIT</Text>         
     </View>
   );
 }
