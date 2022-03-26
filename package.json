@@ -45,6 +45,6 @@
     "assets": [
       "./assets/fonts/"
     ]
-  },
+  },  
   "private": true
 }
