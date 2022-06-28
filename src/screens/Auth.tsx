@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ImageBackground, Text, StyleSheet, View, TextInput, TouchableOpacity, Platform, Alert } from 'react-native'
+import { ImageBackground, Text, StyleSheet, View, TouchableOpacity, Platform, Alert } from 'react-native'
 import axios from 'axios'
 
 import backgroundImage from '../../assets/imgs/login.jpg'
@@ -25,7 +25,7 @@ export default class Auth extends Component {
         if (this.state.stageNew) {
             this.signup()
         }else{
-            Alert.alert('Sucesso!','Logar')
+            this.signin()
         }
     }
 
@@ -45,6 +45,20 @@ export default class Auth extends Component {
         }
     }
 
+    signin = async () => {
+        try {
+            const res = await axios.post(`${server}/signin`, {
+                email: this.state.email,
+                password: this.state.password
+            })
+
+            axios.defaults.headers.common['Authorization'] = `bearer ${res.data.token}`
+            this.props.navigation.navigate('Home')
+        }catch(e) {
+            showError(e)
+        }
+    }
+
     testeBackEnd = async () => {
         try {
             Alert.alert('Sucesso!','teste backend')    
@@ -58,6 +72,18 @@ export default class Auth extends Component {
     }
 
     render() {
+
+        const validations = []
+        validations.push(this.state.email && this.state.email.includes('@'))
+        validations.push(this.state.password && this.state.password.length >= 6)
+
+        if(this.state.stageNew){
+            validations.push(this.state.name && this.state.name.trim().length >= 3)
+            validations.push(this.state.password && this.state.confirmPassword)
+        }
+
+        const validForm = validations.reduce((t, a) => t && a)       
+
         return(
             <ImageBackground source={backgroundImage} style={styles.background}>
                 <Text style={styles.title}> Tasks </Text>
@@ -93,8 +119,10 @@ export default class Auth extends Component {
                             onChangeText={confirmPassword => this.setState({ confirmPassword })} />                    
                     }
 
-                    <TouchableOpacity onPress={this.signinOrSingup}>
-                        <View style={styles.button}>
+                    <TouchableOpacity 
+                        onPress={this.signinOrSingup}
+                        disabled={!validForm}>
+                        <View style={[styles.button, validForm ? {} : { backgroundColor: '#AAA' }]}>                        
                             <Text style={styles.buttonText}>
                                {this.state.stageNew ? 'Registrar' : 'Entrar' }
                             </Text>
